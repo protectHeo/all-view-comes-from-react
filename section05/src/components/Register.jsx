@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useRef} from "react";
 
 const Register = () => {
 
@@ -9,17 +9,29 @@ const Register = () => {
         bio: ""
     });
 
+    const countRef = useRef(0);
+    const inputRef = useRef("");
+
     const onChange = (e) => {
+
+
         setInput({
             ...input,
             [e.target.name]: e.target.value
         });
     }
 
+    const onSubmit = () => {
+        if(input.name === ""){
+            inputRef.current.focus();
+        }
+    };
+
     return (
         <>
             <div>
                 <input
+                    ref={inputRef}
                     name="name"
                     value = {input.name}
                     onChange = {onChange}
@@ -53,6 +65,9 @@ const Register = () => {
                     onChange={onChange}
                 />
             </div>
+            <button
+                onClick={onSubmit}
+            >제출</button>
         </>
     );
 }
