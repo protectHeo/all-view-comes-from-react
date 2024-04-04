@@ -1,15 +1,44 @@
 import "./List.css"
-import todoItem from "./TodoItem.jsx";
 import TodoItem from "./TodoItem.jsx";
+import {useState} from "react";
 
-const List = () => {
+const List = ({todos, onUpdate, onDelete}) => {
+    const [search, setSearch] = useState("");
+
+    const onChangeSearch = (e) => {
+        setSearch(e.target.value);
+    };
+
+    const getFilteredData = () => {
+        if(search === ""){
+            return todos;
+        }
+
+        return todos.filter((todo) => {
+           todo.content
+               .toLowerCase()
+               .includes(search);
+        });
+    };
+
+    const filteredTodos = getFilteredData();
+
     return <div className="List">
         <h4>Todo List💕</h4>
-        <input placeholder="검색어를 입력하세요"/>
+        <input
+            placeholder="검색어를 입력하세요"
+            value={search}
+            onChange={onChangeSearch}
+        />
         <div className={"todos_wrapper"}>
-            <TodoItem></TodoItem>
-            <TodoItem></TodoItem>
-            <TodoItem></TodoItem>
+            {todos.map((todo)=> {
+                return <TodoItem
+                    key={todo.id}
+                    {...todo}
+                    onUpdate={onUpdate}
+                    onDelete={onDelete}
+                ></TodoItem>
+            })};
         </div>
     </div>;
 };
