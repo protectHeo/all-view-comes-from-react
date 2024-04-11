@@ -2,7 +2,7 @@ import './App.css'
 import Header from "./components/Header.jsx";
 import Editor from "./components/Editor.jsx";
 import List from "./components/List.jsx";
-import {useState, useRef, useReducer, useCallback, createContext} from "react";
+import {useState, useRef, useReducer, useCallback, createContext, useMemo} from "react";
 import {act} from "react-dom/test-utils";
 
 const mockData = [
@@ -42,7 +42,8 @@ function reducer(state, action){
     }
 }
 
-export const TodoContext = createContext();
+export const TodoStateContext = createContext();
+export const TodoDispatchContext = createContext();
 
 function App() {
     const [todos, dispatch] = useReducer(reducer, mockData);
@@ -72,16 +73,22 @@ function App() {
             type: "DELETE",
             targetId: targetId
         });
+    }, []);
+
+    const memorizedDispatch = useMemo(()=>{
+        return {onCreate, onUpdate, onDelete};
     }, [])
 
     return <div className="App">
         <Header></Header>
-        <TodoContext.Provider value={{
-            todos, onCreate, onUpdate, onDelete
-        }}>
-        <Editor></Editor>
-        <List></List>
-        </TodoContext.Provider>
+        <TodoStateContext.Provider value={todos}>
+            <TodoDispatchContext.Provider value={memorizedDispatch}>
+                <Editor></Editor>
+                <List></List>
+            </TodoDispatchContext.Provider>
+        </TodoStateContext.Provider>
+
+
     </div>;
 }
 
