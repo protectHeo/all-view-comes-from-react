@@ -2,7 +2,7 @@ import './App.css'
 import Header from "./components/Header.jsx";
 import Editor from "./components/Editor.jsx";
 import List from "./components/List.jsx";
-import {useState, useRef, useReducer} from "react";
+import {useState, useRef, useReducer, useCallback, createContext} from "react";
 import {act} from "react-dom/test-utils";
 
 const mockData = [
@@ -42,6 +42,8 @@ function reducer(state, action){
     }
 }
 
+export const TodoContext = createContext();
+
 function App() {
     const [todos, dispatch] = useReducer(reducer, mockData);
     const idRef = useRef(3);
@@ -58,28 +60,28 @@ function App() {
         });
     };
 
-    const onUpdate = (targetId) => {
+    const onUpdate = useCallback((targetId) => {
         dispatch({
             type: "UPDATE",
             targetId: targetId
         });
-    }
+    }, []);
 
-    const onDelete = (targetId) => {
+    const onDelete = useCallback((targetId) => {
         dispatch({
             type: "DELETE",
             targetId: targetId
         });
-    };
+    }, [])
 
     return <div className="App">
         <Header></Header>
-        <Editor onCreate={onCreate}></Editor>
-        <List
-            todos={todos}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-        ></List>
+        <TodoContext.Provider value={{
+            todos, onCreate, onUpdate, onDelete
+        }}>
+        <Editor></Editor>
+        <List></List>
+        </TodoContext.Provider>
     </div>;
 }
 
